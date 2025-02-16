@@ -66,5 +66,5 @@ python train.py
 ```
 
 ### 引用
-- [Fully 1×1 Convolutional Network for Lightweight Image Super-Resolution](https://arxiv.org/abs/2105.01655)
+- [Fully 1×1 Convolutional Network for Lightweight Image Super-Resolution](http://arxiv.org/abs/2307.16140)
 

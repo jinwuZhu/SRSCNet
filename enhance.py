@@ -3,6 +3,7 @@ import torch
 from torchvision import transforms
 import cv2
 import numpy as np
+from argparse import ArgumentParser
 
 def postprocess_brightness(gray_img, color_img):
     # gray_img = enhance_contrast(gray_img)
@@ -21,15 +22,22 @@ def postprocess_brightness(gray_img, color_img):
     return adjusted_img
 
 def main():
+    parser = ArgumentParser(description='图像增强')
+    parser.add_argument('--model','-m', type=str,default='checkpoints/checkpoint_epoch_1_batch_0.pth', help='模型检查点路径')
+    parser.add_argument('--input','-i', type=str, help='输入文件路径')
+    parser.add_argument('--output', '-o', type=str, default='sr_image.jpg', help='输出文件路径 (默认: sr_image.jpg)')
+
+    args = parser.parse_args()
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SRSCNet()
-    checkpoint = torch.load('checkpoints/checkpoint_epoch_1_batch_0.pth', map_location=device)
+    checkpoint = torch.load(args.model, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)
 
-    input_path = 'comic.bmp'
-    output_path = 'sr_image.jpg'  # 超分辨率图像保存路径
+    input_path = args.input
+    output_path = args.output  # 超分辨率图像保存路径
 
     trans = transforms.Compose([
         transforms.ToTensor(),
@@ -50,9 +58,8 @@ def main():
     output_tensor = (output_tensor * 0.5) + 0.5  # 反归一化
     output_tensor = np.clip(output_tensor, 0, 1)  # 确保像素值在[0, 1]范围内
     output_image = (output_tensor * 255).astype(np.uint8)  # 转换为uint8类型
-    sr_image = cv2.resize(input_img,dsize=(input_img.shape[1]*2,input_img.shape[0]*2),interpolation=cv2.INTER_LINEAR_EXACT)
-    # 保存一份普通放大的图像
-    cv2.imwrite('lsr_image.jpg', sr_image)
+
+    sr_image = cv2.resize(input_img,dsize=(input_img.shape[1]*2,input_img.shape[0]*2),interpolation=cv2.INTER_NEAREST_EXACT)
     sr_image = postprocess_brightness(output_image,sr_image)
     # 保存超分辨率图像
     cv2.imwrite(output_path, sr_image)

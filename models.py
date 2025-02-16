@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 class Shift8(nn.Module):
     def __init__(self,groups:int=4):
+        
         super().__init__()
         self.g = groups
         self.shifts_list = [
@@ -18,14 +19,19 @@ class Shift8(nn.Module):
         ]
         
     def forward(self,x):
-        b,c,h,w = x.shape
-        
-        assert c  == self.g * 8
+        _,c,_,_ = x.shape
 
-        # 
-        for i in range(8):
-            x[:, i * self.g : (i+1) * self.g,:,:] = torch.roll(x[:, i : (i+1) * self.g,:,:],shifts=self.shifts_list[i], dims=(2,3))
+        assert c  == self.g * 8
         
+        #
+        x[:, 0 : 1 * self.g, :, :] = torch.roll(x[:, 0 : 1 * self.g, :, :], shifts=self.shifts_list[0], dims=(2, 3))
+        x[:, 1 * self.g : 2 * self.g, :, :] = torch.roll(x[:, 1 * self.g : 2 * self.g, :, :], shifts=self.shifts_list[1], dims=(2, 3))
+        x[:, 2 * self.g : 3 * self.g, :, :] = torch.roll(x[:, 2 * self.g : 3 * self.g, :, :], shifts=self.shifts_list[2], dims=(2, 3))
+        x[:, 3 * self.g : 4 * self.g, :, :] = torch.roll(x[:, 3 * self.g : 4 * self.g, :, :], shifts=self.shifts_list[3], dims=(2, 3))
+        x[:, 4 * self.g : 5 * self.g, :, :] = torch.roll(x[:, 4 * self.g : 5 * self.g, :, :], shifts=self.shifts_list[4], dims=(2, 3))
+        x[:, 5 * self.g : 6 * self.g, :, :] = torch.roll(x[:, 5 * self.g : 6 * self.g, :, :], shifts=self.shifts_list[5], dims=(2, 3))
+        x[:, 6 * self.g : 7 * self.g, :, :] = torch.roll(x[:, 6 * self.g : 7 * self.g, :, :], shifts=self.shifts_list[6], dims=(2, 3))
+        x[:, 7 * self.g : 8 * self.g, :, :] = torch.roll(x[:, 7 * self.g : 8 * self.g, :, :], shifts=self.shifts_list[7], dims=(2, 3))
         return x
 
 class ResidualBlockShift(nn.Module):

@@ -4,7 +4,7 @@ import time
 
 
 def main():
-    original_image = cv2.imread('images/1.png',cv2.IMREAD_COLOR)
+    original_image = cv2.imread('test.jpg',cv2.IMREAD_COLOR)
     low_image = cv2.resize(original_image,dsize=(original_image.shape[1] // 2, original_image.shape[0]//2))
     cv2.imwrite('low.jpg',low_image)
     lsr_image = cv2.resize(low_image,dsize=(original_image.shape[1], original_image.shape[0]))

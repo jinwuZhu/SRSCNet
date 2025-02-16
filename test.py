@@ -23,7 +23,7 @@ def postprocess_brightness(gray_img, color_img):
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SRSCNet()
-    checkpoint = torch.load('checkpoints/checkpoint_epoch_89_batch_0.pth', map_location=device)
+    checkpoint = torch.load('checkpoints/checkpoint_epoch_1_batch_0.pth', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)
@@ -50,7 +50,7 @@ def main():
     output_tensor = (output_tensor * 0.5) + 0.5  # 反归一化
     output_tensor = np.clip(output_tensor, 0, 1)  # 确保像素值在[0, 1]范围内
     output_image = (output_tensor * 255).astype(np.uint8)  # 转换为uint8类型
-    sr_image = cv2.resize(input_img,dsize=(input_img.shape[1]*2,input_img.shape[0]*2))
+    sr_image = cv2.resize(input_img,dsize=(input_img.shape[1]*2,input_img.shape[0]*2),interpolation=cv2.INTER_LINEAR_EXACT)
     # 保存一份普通放大的图像
     cv2.imwrite('lsr_image.jpg', sr_image)
     sr_image = postprocess_brightness(output_image,sr_image)

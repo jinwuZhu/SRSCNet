@@ -10,12 +10,8 @@
 ### 效果展示
 
 - 图像超清对比（左边是普通放大方式，右边是SRSCNet）
-<table>
-<tr>
-<td><img alt='diff' src='./lsr_image.jpg'></td>
-<td><img alt='diff' src='./sr_image.jpg'></td>
-</tr>
-</table>
+
+<img alt='diff' src='./comic_diff.png'>
 
 ### 如何使用
 - 使用预训练的模型: 

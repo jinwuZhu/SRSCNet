@@ -15,7 +15,7 @@ lr = 0.0002
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 加载模型
-checkpoint_path = "" # "checkpoints/checkpoint_GAN_5.pth"
+checkpoint_path = "checkpoints/checkpoint_GAN_0.pth"
 netG = SRSCNet()        # 生成器
 netD = Discriminator()  # 判别器
 netG.to(device)
@@ -93,7 +93,7 @@ for epoch in range(num_epochs):
             # 计算L1损失（或其他重建损失）
             loss_l1 = criterion_l1(fake_images, targets)
             # 总生成器损失是L1损失加上对抗损失
-            loss_G = 7 * loss_l1 + 1.2 * loss_fake_D
+            loss_G = 0.8 * loss_l1 + 0.2 * loss_fake_D
             # 反向传播并更新生成器参数
             loss_G.backward()
             optimizerG.step()

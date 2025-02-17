@@ -23,7 +23,7 @@ def postprocess_brightness(gray_img, color_img):
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SRSCNet()
-    checkpoint = torch.load('checkpoints/checkpoint_epoch_1_batch_0.pth', map_location=device)
+    checkpoint = torch.load('checkpoints/checkpoint_GAN_5.pth', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)

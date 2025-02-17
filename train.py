@@ -87,9 +87,9 @@ def train(model, dataloader, criterion, optimizer, device):
         optimizer.step()
         running_loss += loss.item()
         if(batch_idx == 0):
-            dump_frist_output(inputs,path="input.png")
-            dump_frist_output(outputs,path="output.png")
-            dump_frist_output(targets,path="target.png")
+            dump_frist_output(inputs,path="temp/input.png")
+            dump_frist_output(outputs,path="temp/output.png")
+            dump_frist_output(targets,path="temp/target.png")
         print('Batch %d loss: %.4f'%(batch_idx,loss.item()))
 
     print(f"Training Loss: {running_loss/len(dataloader):.4f}")
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.5], std=[0.5])  # 单通道，均值和标准差只需一个数值
     ])
 
-    dataset = HDImageDataset(image_folder, transform=transform,crop_size=(512,512))
+    dataset = HDImageDataset(image_folder, transform=transform,crop_size=(256,256))
     dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
     criterion = torch.nn.L1Loss()  # 可以尝试其他损失函数，如MSELoss

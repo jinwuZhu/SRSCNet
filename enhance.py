@@ -23,14 +23,14 @@ def postprocess_brightness(gray_img, color_img):
 
 def main():
     parser = ArgumentParser(description='图像增强')
-    parser.add_argument('--model','-m', type=str,default='checkpoints/checkpoint_epoch_1_batch_0.pth', help='模型检查点路径')
+    parser.add_argument('--model','-m', type=str,default='checkpoints/checkpoint_GAN_0.pth', help='模型检查点路径')
     parser.add_argument('--input','-i', type=str, help='输入文件路径')
     parser.add_argument('--output', '-o', type=str, default='sr_image.jpg', help='输出文件路径 (默认: sr_image.jpg)')
 
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SRSCNet()
+    model = SRSCNet(num_ch=1,num_res=16,num_feat=32)
     checkpoint = torch.load(args.model, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
@@ -48,7 +48,7 @@ def main():
     # 将原图下采样取得低分辨率的测试图
     input_img = cv2.resize(original_img,dsize=(original_img.shape[1]//2, original_img.shape[0]//2))
     # 取得亮度作为输入
-    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2GRAY)
+    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2HLS)[:,:,1]
     input = trans(input_l).unsqueeze(0).to(device)
 
     with torch.no_grad():

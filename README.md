@@ -11,7 +11,7 @@
 
 - 图像超清对比（左边是普通放大方式，右边是SRSCNet）
 
-<img alt='diff' src='./comic_diff.png'>
+<iframe src="ICAT-DIFF/index.html"></iframe>
 
 ### 如何使用
 - 使用预训练的模型: 

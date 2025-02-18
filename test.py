@@ -22,14 +22,14 @@ def postprocess_brightness(gray_img, color_img):
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SRSCNet()
-    checkpoint = torch.load('checkpoints/checkpoint_GAN_5.pth', map_location=device)
+    model = SRSCNet(num_ch=1, num_res=16, num_feat=32)
+    checkpoint = torch.load('checkpoints/checkpoint_GAN_0.pth', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)
 
     input_path = 'comic.bmp'
-    output_path = 'sr_image.jpg'  # 超分辨率图像保存路径
+    output_path = 'sr_image_hls.jpg'  # 超分辨率图像保存路径
 
     trans = transforms.Compose([
         transforms.ToTensor(),
@@ -40,7 +40,7 @@ def main():
     # 将原图下采样取得低分辨率的测试图
     input_img = cv2.resize(original_img,dsize=(original_img.shape[1]//2, original_img.shape[0]//2))
     # 取得亮度作为输入
-    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2GRAY)
+    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2HLS)[:,:,1]
     input = trans(input_l).unsqueeze(0).to(device)
 
     with torch.no_grad():

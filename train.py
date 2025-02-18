@@ -99,7 +99,7 @@ if __name__ == '__main__':
     continue_checkpoint = False
     # 设置参数
     image_folder = "data/DIV2K_train_HR"
-    model = SRSCNet()  # 确保你的模型支持单通道输入
+    model = SRSCNet(num_ch=1,num_res=16,num_feat=32)  # 确保你的模型支持单通道输入
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 

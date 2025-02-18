@@ -15,11 +15,24 @@ from datasets import HDImageDataset
 from ssim import SSIM
 from utils import dump_frist_output
 
+from argparse import ArgumentParser
+
 if __name__ == '__main__':
-    epochs = 20
-    batch_size = 8
-    train_dataset_folder = 'data/Flickr2K_HR_1-2000'
-    test_dataset_folder = 'data/Flickr2K_HR_1-2000'
+    parser = ArgumentParser(description='图像增强')
+    parser.add_argument('--checkpoint','-c', type=str,default='checkpoints/checkpoint_GAN_0.pth', help='从指定的检查点文件继续')
+    parser.add_argument('--datafolder', '-d', type=str, default= 'data/Flickr2K_HR_1-2000', help='训练数据集路径')
+    parser.add_argument('--testfolder', '-t', type=str, default= 'data/Flickr2K_HR_1-2000', help='测试数据集路径')
+    parser.add_argument('--epochs', '-e', type=int, default=10, help='训练次数')
+    parser.add_argument('--batch', '-b', type=int, default=2, help='批次大小')
+    parser.add_argument('--device', type=str, default='cpu', help='训练设备')
+
+    args = parser.parse_args()
+
+    epochs = args.epochs
+    batch_size = args.batch
+    train_dataset_folder = args.datafolder
+    test_dataset_folder = args.testfolder
+    checkpoint_path = args.checkpoint
     checkpoints_save_folder = "checkpoints"
 
     # 创建用于保存训练结果的目录
@@ -27,18 +40,19 @@ if __name__ == '__main__':
         os.makedirs(checkpoints_save_folder)
     
     #gpu还是cpu
-    device = "cpu"
+    device = args.device
     # if torch.cuda.is_available():
     #     device = "cuda:0"
     # else:
     #     device = "cpu"
+
 
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5], std=[0.5])  # 单通道归一化
     ])
     #构建数据集
-    train_dataset = HDImageDataset(train_dataset_folder,transform=transform, crop_size=(256, 256),max_len=400)
+    train_dataset = HDImageDataset(train_dataset_folder,transform=transform, crop_size=(256, 256))
     #加快训练设置了<num_workers，pin_memory，drop_last>资源不足可以都删除掉
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=16, pin_memory=True, drop_last=True)
     valid_dataset = HDImageDataset(test_dataset_folder,transform=transform, crop_size=(256, 256),max_len=4)
@@ -50,6 +64,14 @@ if __name__ == '__main__':
     #创建判别器
     netD = Discriminator().to(device)
     print(f'Discriminator Parameters Size:{sum(p.numel() for p in netD.parameters() if p.requires_grad) / 1000000.0 :.2f} MB')
+    
+    # 加载预训练模型
+    if(checkpoint_path != None and checkpoint_path != ''):
+        print("加载检查点...")
+        checkpoint = torch.load(checkpoint_path,map_location=torch.device(device=device))
+        netG.load_state_dict(checkpoint['model_state_dict'])
+        netD.load_state_dict(checkpoint['D_model_state_dict'])
+        print("载检查点已加载!!!")
 
     # 创建生成器损失函数对象GeneratorLoss
     generator_criterion = GeneratorLoss().to(device)

@@ -11,7 +11,10 @@
 
 - 图像超清对比（左边是普通放大方式，右边是SRSCNet）
 
-<iframe src="ICAT-DIFF/index.html"></iframe>
+<table>
+<tr><td><img src="images/butterfly_GT_lsr.jpg"></td><td><img src="images/butterfly_GT_sr.jpg"></td></tr>
+<tr><td><img src="images/lsr_image.jpg"></td><td><img src="images/sr_image_hls.jpg"></td></tr>
+<table>
 
 ### 如何使用
 - 使用预训练的模型: 
@@ -48,17 +51,18 @@ pip install opencv-python
 2.  获取训练好的模型，并放到工程目录下。（注意：你也可以另外放到指定目录下，但是你需要指定 --model 参数来确定加载地址）
 
 ### 如何训练
+本工程的训练均是由高清图下采样得到的数据集，你只需要准备一个文件夹存放图片数据即可
 
-- 本工程提供了一个非GAN的训练脚本 <b>train.py</b>
+- 非GAN的训练脚本 <b>train.py</b>
+
 ```
-python train.py
+python train.py --datafolder '图片文件夹路径'
 ```
 
-### 其他问题
+- GAN对抗训练
 
-1. 为什么不提使用GAN训练？
 ```
-因为我不会设计GAN训练，暂时没时间做GAN训练。理论上GAN训练能达到更好的超分效果。 欢迎协助完善GAN训练部分
+python traingan.py --datafolder '图片文件夹路径' --device 'cpu'
 ```
 
 ### 引用

@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import os
+from argparse import ArgumentParser
 
 from models import SRSCNet
 from datasets import HDImageDataset
@@ -95,10 +96,16 @@ def train(model, dataloader, criterion, optimizer, device):
     print(f"Training Loss: {running_loss/len(dataloader):.4f}")
 
 if __name__ == '__main__':
+    parser = ArgumentParser(description='图像增强')
+    parser.add_argument('--checkpoint','-c', type=str,default='no', help='从检查点继续？yes:no')
+    parser.add_argument('--datafolder', '-d', type=str, default='data/DIV2K_train_HR', help='训练数据集路径')
+
+    args = parser.parse_args()
+
     # 如果需要从检查点继续训练，将此值设置为True
-    continue_checkpoint = False
+    continue_checkpoint = True if args.datafolder == "yes" else False
     # 设置参数
-    image_folder = "data/DIV2K_train_HR"
+    image_folder = args.datafolder
     model = SRSCNet(num_ch=1,num_res=16,num_feat=32)  # 确保你的模型支持单通道输入
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)

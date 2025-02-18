@@ -46,7 +46,7 @@ def main():
     original_img = cv2.imread(input_path, cv2.IMREAD_COLOR)
     
     # 将原图下采样取得低分辨率的测试图
-    input_img = cv2.resize(original_img,dsize=(original_img.shape[1]//2, original_img.shape[0]//2))
+    input_img = original_img
     # 取得亮度作为输入
     input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2HLS)[:,:,1]
     input = trans(input_l).unsqueeze(0).to(device)

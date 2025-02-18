@@ -91,7 +91,7 @@ class SRSCNet(nn.Module):
         self.lrelu = nn.LeakyReLU(negative_slope=0.1, inplace=True)
 
         self.conv_last = nn.Conv2d(num_feat, num_ch, kernel_size=1)
-        self.tanh = nn.Tanh()
+        # self.tanh = nn.Tanh()
     
     def forward(self, x):
         # -1,1,H,W
@@ -99,7 +99,7 @@ class SRSCNet(nn.Module):
         y = self.lrelu(y)
         y = self.res_block(y)
         y = self.lrelu(self.pixel_shuffle(self.upconv(y)))
-        out = self.conv_last(self.tanh(self.conv_hr(y)))
+        out = self.conv_last(self.lrelu(self.conv_hr(y)))
         # out 其实学习到的是普通增强后和原图的差别
         base = F.interpolate(x, scale_factor=self.upscale, mode='bilinear', align_corners=False)
         out += base
@@ -138,11 +138,15 @@ if __name__ == '__main__':
     model_D = Discriminator()
     summary(model_D,input_size=(1,256,256),device='cpu')
     exit()
+    # model = SRSCNet()
+    # summary(model=model,input_size=(1,400,280),device='cpu')
+    # exit()
     import time
     import torch.quantization
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = SRSCNet()
-    # summary(model=model,input_size=(1,400,280),device='cpu')
+    summary(model=model,input_size=(1,400,280),device='cpu')
+    exit()
     model.eval()
     input = torch.rand(size=(12,1,1280//2,720//2),device=device)
     start_time = time.time()

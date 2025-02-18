@@ -32,10 +32,14 @@ class HDImageDataset(Dataset):
         # 从IMAGE中随机裁剪一块区域
         image = self.random_crop(image)
         # 提取区域的L通道
+        low_hls_image = cv2.resize(image,dsize=(image.shape[1]//4,image.shape[0]//4))
+        low_hls_image = cv2.resize(low_hls_image,dsize=(image.shape[1]//2,image.shape[0]//2))
+        low_hls_image = cv2.cvtColor(low_hls_image,cv2.COLOR_BGR2HLS)
+
         hls_image = cv2.cvtColor(image,cv2.COLOR_BGR2HLS)
         l_channel = hls_image[:, :, 1]
         # 下采样的L通道
-        l_low_channel = cv2.resize(l_channel,dsize=(image.shape[1]//2,image.shape[0]//2))
+        l_low_channel = low_hls_image[:,:,1]
         if self.transform:
             l_channel = self.transform(l_channel)
             l_low_channel = self.transform(l_low_channel)

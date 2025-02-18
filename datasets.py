@@ -4,8 +4,10 @@ import cv2
 import random
 
 class HDImageDataset(Dataset):
-    def __init__(self, image_folder:str, transform=None,crop_size:tuple[int]=(512,512)):
+    def __init__(self, image_folder:str, transform=None,crop_size:tuple[int]=(512,512),max_len:int = -1):
         self.image_paths = [os.path.join(image_folder, x) for x in os.listdir(image_folder) if x.endswith('.png') or x.endswith('.jpg')]
+        if(max_len >= 0 and len(self.image_paths) > max_len):
+            self.image_paths=self.image_paths[:max_len]
         self.transform = transform
         self.crop_size = crop_size  # 裁剪区域的大小
     

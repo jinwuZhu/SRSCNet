@@ -3,6 +3,7 @@ import torch
 from torchvision import transforms
 import cv2
 import numpy as np
+from pathlib import Path
 
 def postprocess_brightness(gray_img, color_img):
     # gray_img = enhance_contrast(gray_img)
@@ -22,14 +23,14 @@ def postprocess_brightness(gray_img, color_img):
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SRSCNet()
-    checkpoint = torch.load('checkpoints/checkpoint_epoch_1_batch_0.pth', map_location=device)
+    model = SRSCNet(num_ch=1, num_res=16, num_feat=32)
+    checkpoint = torch.load('checkpoints/checkpoint_GAN_0.pth', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)
-
-    input_path = 'comic.bmp'
-    output_path = 'sr_image.jpg'  # 超分辨率图像保存路径
+    input_path = 'images/comic.bmp'
+    input_name = Path(input_path).stem
+    output_path = f'images/{input_name}_sr.jpg'
 
     trans = transforms.Compose([
         transforms.ToTensor(),
@@ -40,7 +41,7 @@ def main():
     # 将原图下采样取得低分辨率的测试图
     input_img = cv2.resize(original_img,dsize=(original_img.shape[1]//2, original_img.shape[0]//2))
     # 取得亮度作为输入
-    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2GRAY)
+    input_l = cv2.cvtColor(input_img,cv2.COLOR_BGR2HLS)[:,:,1]
     input = trans(input_l).unsqueeze(0).to(device)
 
     with torch.no_grad():
@@ -52,7 +53,8 @@ def main():
     output_image = (output_tensor * 255).astype(np.uint8)  # 转换为uint8类型
     sr_image = cv2.resize(input_img,dsize=(input_img.shape[1]*2,input_img.shape[0]*2),interpolation=cv2.INTER_LINEAR_EXACT)
     # 保存一份普通放大的图像
-    cv2.imwrite('lsr_image.jpg', sr_image)
+    lsr_path = f'images/{input_name}_lsr.jpg'
+    cv2.imwrite(lsr_path, sr_image)
     sr_image = postprocess_brightness(output_image,sr_image)
     # 保存超分辨率图像
     cv2.imwrite(output_path, sr_image)

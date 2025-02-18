@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import os
+from argparse import ArgumentParser
 
 from models import SRSCNet
 from datasets import HDImageDataset
@@ -87,19 +88,25 @@ def train(model, dataloader, criterion, optimizer, device):
         optimizer.step()
         running_loss += loss.item()
         if(batch_idx == 0):
-            dump_frist_output(inputs,path="input.png")
-            dump_frist_output(outputs,path="output.png")
-            dump_frist_output(targets,path="target.png")
+            dump_frist_output(inputs,path="temp/input.png")
+            dump_frist_output(outputs,path="temp/output.png")
+            dump_frist_output(targets,path="temp/target.png")
         print('Batch %d loss: %.4f'%(batch_idx,loss.item()))
 
     print(f"Training Loss: {running_loss/len(dataloader):.4f}")
 
 if __name__ == '__main__':
+    parser = ArgumentParser(description='图像增强')
+    parser.add_argument('--checkpoint','-c', type=str,default='no', help='从检查点继续？yes:no')
+    parser.add_argument('--datafolder', '-d', type=str, default='data/DIV2K_train_HR', help='训练数据集路径')
+
+    args = parser.parse_args()
+
     # 如果需要从检查点继续训练，将此值设置为True
-    continue_checkpoint = False
+    continue_checkpoint = True if args.datafolder == "yes" else False
     # 设置参数
-    image_folder = "data/DIV2K_train_HR"
-    model = SRSCNet()  # 确保你的模型支持单通道输入
+    image_folder = args.datafolder
+    model = SRSCNet(num_ch=1,num_res=16,num_feat=32)  # 确保你的模型支持单通道输入
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
@@ -108,7 +115,7 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.5], std=[0.5])  # 单通道，均值和标准差只需一个数值
     ])
 
-    dataset = HDImageDataset(image_folder, transform=transform,crop_size=(512,512))
+    dataset = HDImageDataset(image_folder, transform=transform,crop_size=(256,256))
     dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
     criterion = torch.nn.L1Loss()  # 可以尝试其他损失函数，如MSELoss

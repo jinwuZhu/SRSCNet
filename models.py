@@ -118,7 +118,11 @@ class Discriminator(nn.Module):
             return nn.Sequential(*layers)
         
         self.conv_block = nn.Sequential(
-            conv_block(in_channels, 64, batch_norm=False),  # (B, 1, H, W) -> (B, 64, H/2, W/2)
+            nn.Conv2d(in_channels=in_channels,out_channels=1,kernel_size=3,padding=1),
+            nn.BatchNorm2d(1),
+            nn.LeakyReLU(),
+
+            conv_block(1, 64, batch_norm=False),  # (B, 1, H, W) -> (B, 64, H/2, W/2)
             conv_block(64, 128),  # (B, 64, H/2, W/2) -> (B, 128, H/4, W/4)
             conv_block(128, 256), # (B, 128, H/4, W/4) -> (B, 256, H/8, W/8)
             conv_block(256, 512), # (B, 256, H/8, W/8) -> (B, 512, H/16, W/16)
@@ -135,12 +139,12 @@ class Discriminator(nn.Module):
 
 if __name__ == '__main__':
     from torchsummary import summary
-    model_D = Discriminator()
-    summary(model_D,input_size=(1,256,256),device='cpu')
-    exit()
-    # model = SRSCNet()
-    # summary(model=model,input_size=(1,400,280),device='cpu')
+    # model_D = Discriminator(in_channels=3)
+    # summary(model_D,input_size=(3,256,256),device='cpu')
     # exit()
+    model = SRSCNet(num_ch=3,num_res=16,num_feat=128)
+    summary(model=model,input_size=(3,128,128),device='cpu')
+    exit()
     import time
     import torch.quantization
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

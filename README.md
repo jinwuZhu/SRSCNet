@@ -1,8 +1,20 @@
-### SRSCNet
+# SRSCNet
+
+SRSCNet是一个单卷积图像超分轻量化模型
+
+<table>
+  <tr>
+    <td><img src="images/input.jpg"></td>
+    <td><img src="images/right.png" width="100"></td>
+    <td><img src="images/output.jpg"></td>
+  </tr>
+</table>
+
+### 特性
 
 - 1x1 卷积网络，实现轻量级图像超分辨率。
-- 该模型可以通过极小的参数量训练产生不错的图像增强效果。
-- 相比同等非GAN训练的 SRResNet 质量相差不大且有超50倍的速度提升。
+- 该模型可以通过极小的参数量训练产生不错的图像增强效果
+- 初步统计速度快一般的SRResNet超50倍+。
 
 ### 支持的功能
 - 图片2倍超分，增强
@@ -13,7 +25,7 @@
 
 <table>
 <tr><td><img src="images/butterfly_GT_lsr.jpg"></td><td><img src="images/butterfly_GT_sr.jpg"></td></tr>
-<tr><td><img src="images/lsr_image.jpg"></td><td><img src="images/sr_image_hls.jpg"></td></tr>
+<tr><td><img src="images/comic_lsr.jpg"></td><td><img src="images/comic_sr.jpg"></td></tr>
 <table>
 
 ### 如何使用

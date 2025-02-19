@@ -3,9 +3,9 @@ from torch import nn
 from torchvision.models.vgg import vgg16
 
 class GeneratorLoss(nn.Module):
-    def __init__(self):
+    def __init__(self,num_ch:int = 3):
         super(GeneratorLoss, self).__init__()
-
+        self.num_ch = num_ch
         vgg = vgg16(pretrained=True)
         # 选择 VGG16 模型的前 31 层作为损失网络，并将其设置为评估模式（不进行梯度更新）
         loss_network = nn.Sequential(*list(vgg.features)[:31]).eval()
@@ -19,10 +19,14 @@ class GeneratorLoss(nn.Module):
         self.tv_loss = TVLoss()
 
     def forward(self, out_labels, pre_y, real_y):
-        # 将单通道图像复制为三通道
-        out_images = pre_y.repeat(1, 3, 1, 1)  # 在通道维度上重复三次
-        target_images = real_y.repeat(1, 3, 1, 1)
-
+        if(self.num_ch == 1):
+            # 将单通道图像复制为三通道
+            out_images = pre_y.repeat(1, 3, 1, 1)  # 在通道维度上重复三次
+            target_images = real_y.repeat(1, 3, 1, 1)
+        else:
+            out_images = pre_y
+            target_images = real_y
+        
         # Adversarial Loss（对抗损失）：使生成的图像更接近真实图像，目标是最小化生成器对图像的判别结果的平均值与 1 的差距
         adversarial_loss = torch.mean(1 - out_labels)
         # Perception Loss（感知损失）：计算生成图像和目标图像在特征提取网络中提取的特征之间的均方误差损失

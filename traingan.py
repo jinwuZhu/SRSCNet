@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from loss import GeneratorLoss
 from models import Discriminator, SRSCNet
 from torchvision import transforms
-from datasets import HDImageDataset
+from datasets import HDImageDatasetN3
 from ssim import SSIM
 from utils import dump_frist_output
 
@@ -19,11 +19,11 @@ from argparse import ArgumentParser
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='图像增强')
-    parser.add_argument('--checkpoint','-c', type=str,default='checkpoints/checkpoint_GAN_0_0.pth', help='从指定的检查点文件继续')
-    parser.add_argument('--datafolder', '-d', type=str, default= 'data/archive/train/images', help='训练数据集路径')
+    parser.add_argument('--checkpoint','-c', type=str,default='checkpoints/checkpoint_GAN_19.pth', help='从指定的检查点文件继续')
+    parser.add_argument('--datafolder', '-d', type=str, default= 'data/archive/test/images', help='训练数据集路径')
     parser.add_argument('--testfolder', '-t', type=str, default= 'data/archive/test/images', help='测试数据集路径')
-    parser.add_argument('--epochs', '-e', type=int, default=100, help='训练次数')
-    parser.add_argument('--batch', '-b', type=int, default=16, help='批次大小')
+    parser.add_argument('--epochs', '-e', type=int, default=30, help='训练次数')
+    parser.add_argument('--batch', '-b', type=int, default=8, help='批次大小')
     parser.add_argument('--device', type=str, default='cuda', help='训练设备')
 
     args = parser.parse_args()
@@ -53,17 +53,17 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.5], std=[0.5])  # 单通道归一化
     ])
     #构建数据集
-    train_dataset = HDImageDataset(train_dataset_folder,transform=transform, crop_size=(input_size, input_size))
+    train_dataset = HDImageDatasetN3(train_dataset_folder,transform=transform, crop_size=(input_size, input_size),max_len=400)
     #加快训练设置了<num_workers，pin_memory，drop_last>资源不足可以都删除掉
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=16, pin_memory=True, drop_last=True)
-    valid_dataset = HDImageDataset(test_dataset_folder,transform=transform, crop_size=(input_size, input_size),max_len=4)
+    valid_dataset = HDImageDatasetN3(test_dataset_folder,transform=transform, crop_size=(input_size, input_size),max_len=4)
     valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=16, pin_memory=True)
 
     # 创建生成器模型对象Generator
-    netG = SRSCNet(num_ch=1,num_res=16,num_feat=32).to(device)
+    netG = SRSCNet(num_ch=3,num_res=32, num_feat=128).to(device)
     print(f'Generator Parameters Size:{sum(p.numel() for p in netG.parameters() if p.requires_grad) / 1000000.0 :.2f} MB')
     #创建判别器
-    netD = Discriminator().to(device)
+    netD = Discriminator(in_channels = 3).to(device)
     print(f'Discriminator Parameters Size:{sum(p.numel() for p in netD.parameters() if p.requires_grad) / 1000000.0 :.2f} MB')
     
     # 加载预训练模型

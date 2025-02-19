@@ -32,8 +32,8 @@ class HDImageDataset(Dataset):
         # 从IMAGE中随机裁剪一块区域
         image = self.random_crop(image)
         # 提取区域的L通道
-        low_hls_image = cv2.resize(image,dsize=(image.shape[1]//4,image.shape[0]//4))
-        low_hls_image = cv2.resize(low_hls_image,dsize=(image.shape[1]//2,image.shape[0]//2))
+        # low_hls_image = cv2.resize(image,dsize=(image.shape[1]//4,image.shape[0]//4))
+        low_hls_image = cv2.resize(image,dsize=(image.shape[1]//2,image.shape[0]//2))
         low_hls_image = cv2.cvtColor(low_hls_image,cv2.COLOR_BGR2HLS)
 
         hls_image = cv2.cvtColor(image,cv2.COLOR_BGR2HLS)
@@ -45,4 +45,44 @@ class HDImageDataset(Dataset):
             l_low_channel = self.transform(l_low_channel)
 
         return l_low_channel, l_channel  # 返回低分辨率图像和对应的高清图像
+
+
+class HDImageDatasetN3(Dataset):
+    def __init__(self, image_folder:str, transform=None,crop_size:tuple[int]=(512,512),max_len:int = -1):
+        self.image_paths = [os.path.join(image_folder, x) for x in os.listdir(image_folder) if x.endswith('.png') or x.endswith('.jpg')]
+        if(max_len >= 0 and len(self.image_paths) > max_len):
+            self.image_paths=self.image_paths[:max_len]
+        self.transform = transform
+        self.crop_size = crop_size  # 裁剪区域的大小
+    
+    def __len__(self):
+        return len(self.image_paths)
+    
+    def random_crop(self,image):
+        # 确保图像尺寸大于裁剪尺寸
+        assert image.shape[0] >= self.crop_size[0] and image.shape[1] >= self.crop_size[1], "图像尺寸小于裁剪尺寸"
+
+        # 随机选择起始点坐标
+        top = random.randint(0, image.shape[0] - self.crop_size[0])
+        left = random.randint(0, image.shape[1] - self.crop_size[1])
+
+        # 裁剪图像
+        cropped_image = image[top: top + self.crop_size[0], left: left + self.crop_size[1]]
+        return cropped_image
+
+    def __getitem__(self, index):
+        image_path = self.image_paths[index]
+        image = cv2.imread(image_path,cv2.IMREAD_COLOR)
+        # 从IMAGE中随机裁剪一块区域
+        image = self.random_crop(image)
+        # 提取区域的L通道
+        low_hls_image = cv2.resize(image,dsize=(image.shape[1]//4,image.shape[0]//4))
+        low_hls_image = cv2.resize(low_hls_image,dsize=(image.shape[1]//2,image.shape[0]//2))
+        
+        hls_image = image
+        if self.transform:
+            hls_image = self.transform(hls_image)
+            low_hls_image = self.transform(low_hls_image)
+
+        return low_hls_image, hls_image  # 返回低分辨率图像和对应的高清图像
 

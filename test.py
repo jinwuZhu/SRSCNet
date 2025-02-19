@@ -12,7 +12,7 @@ def main():
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)
-    input_path = 'images/target.jpg'
+    input_path = 'images/cat.jpeg'
     input_name = Path(input_path).stem
     output_path = f'images/{input_name}_sr.jpg'
 

@@ -77,6 +77,16 @@ python train.py --datafolder '图片文件夹路径'
 python traingan.py --datafolder '图片文件夹路径' --device 'cpu'
 ```
 
+### 训练建议
+
+- <b>初期:</b> 
+
+如果只有高清图像进行训练（目前内置训练脚本），建议在训练初期，对于输入，使用2次下采样后再上采样一次，这样能更快的训练出轮廓。之后再进行2x的训练进行微调（主要目的是消除前期4x的伪影，同时优化细节）。
+
+- <b>中后期:</b>
+
+批次大小可以缓慢降低，输入输出尺寸也可以尝试缓慢降低。
+
 ### 引用
 - [Fully 1×1 Convolutional Network for Lightweight Image Super-Resolution](http://arxiv.org/abs/2307.16140)
 

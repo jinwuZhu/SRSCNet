@@ -106,7 +106,7 @@ if __name__ == '__main__':
     continue_checkpoint = True if args.datafolder == "yes" else False
     # 设置参数
     image_folder = args.datafolder
-    model = SRSCNet(num_ch=1,num_res=16,num_feat=32)  # 确保你的模型支持单通道输入
+    model = SRSCNet(num_ch=3,num_res=16,num_feat=64)  # 确保你的模型支持单通道输入
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 

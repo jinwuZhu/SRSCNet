@@ -4,9 +4,9 @@ SRSCNet是一个单卷积图像超分轻量化模型
 
 <table>
   <tr>
-    <td><img src="images/input.jpg"></td>
+    <td><img src="temp/input.jpg" width="256px"></td>
     <td><img src="images/right.png" width="100"></td>
-    <td><img src="images/output.jpg"></td>
+    <td><img src="temp/output.jpg" width="256px"></td>
   </tr>
 </table>
 
@@ -24,8 +24,8 @@ SRSCNet是一个单卷积图像超分轻量化模型
 - 图像超清对比（左边是普通放大方式，右边是SRSCNet）
 
 <table>
-<tr><td><img src="images/butterfly_GT_lsr.jpg"></td><td><img src="images/butterfly_GT_sr.jpg"></td></tr>
 <tr><td><img src="images/comic_lsr.jpg"></td><td><img src="images/comic_sr.jpg"></td></tr>
+<tr><td><img src="images/butterfly_GT_lsr.jpg"></td><td><img src="images/butterfly_GT_sr.jpg"></td></tr>
 <table>
 
 ### 如何使用

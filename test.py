@@ -4,12 +4,11 @@ from torchvision import transforms
 import cv2
 import numpy as np
 from pathlib import Path
-from utils import dump_frist_output
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SRSCNet(num_ch=3, num_res=32, num_feat=128)
-    checkpoint = torch.load('checkpoints/checkpoint_GAN_6.pth', map_location=device)
+    checkpoint = torch.load('checkpoints/checkpoint_GAN_0_2.pth', map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     model.to(device)

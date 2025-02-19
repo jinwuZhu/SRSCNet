@@ -1,3 +1,6 @@
 /__pycache__/
 data/**
 runs/**
+/checkpoints/checkpoint_GAN_[1-9][0-9].pth
+/checkpoints/checkpoint_GAN_[1-9][0-9][0-9].pth
+/checkpoints/checkpoint_GAN_[1-9][0-9][0-9][0-9].pth

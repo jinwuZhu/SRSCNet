@@ -91,7 +91,7 @@ class SRSCNet(nn.Module):
         self.lrelu = nn.LeakyReLU(negative_slope=0.1, inplace=True)
 
         self.conv_last = nn.Conv2d(num_feat, num_ch, kernel_size=1)
-        self.tanh = nn.Tanh()
+        # self.tanh = nn.Tanh()
     
     def forward(self, x):
         # -1,1,H,W
@@ -99,7 +99,7 @@ class SRSCNet(nn.Module):
         y = self.lrelu(y)
         y = self.res_block(y)
         y = self.lrelu(self.pixel_shuffle(self.upconv(y)))
-        out = self.conv_last(self.tanh(self.conv_hr(y)))
+        out = self.conv_last(self.lrelu(self.conv_hr(y)))
         # out 其实学习到的是普通增强后和原图的差别
         base = F.interpolate(x, scale_factor=self.upscale, mode='bilinear', align_corners=False)
         out += base
@@ -118,7 +118,11 @@ class Discriminator(nn.Module):
             return nn.Sequential(*layers)
         
         self.conv_block = nn.Sequential(
-            conv_block(in_channels, 64, batch_norm=False),  # (B, 1, H, W) -> (B, 64, H/2, W/2)
+            nn.Conv2d(in_channels=in_channels,out_channels=1,kernel_size=3,padding=1),
+            nn.BatchNorm2d(1),
+            nn.LeakyReLU(),
+
+            conv_block(1, 64, batch_norm=False),  # (B, 1, H, W) -> (B, 64, H/2, W/2)
             conv_block(64, 128),  # (B, 64, H/2, W/2) -> (B, 128, H/4, W/4)
             conv_block(128, 256), # (B, 128, H/4, W/4) -> (B, 256, H/8, W/8)
             conv_block(256, 512), # (B, 256, H/8, W/8) -> (B, 512, H/16, W/16)
@@ -135,14 +139,18 @@ class Discriminator(nn.Module):
 
 if __name__ == '__main__':
     from torchsummary import summary
-    model_D = Discriminator()
-    summary(model_D,input_size=(1,256,256),device='cpu')
+    # model_D = Discriminator(in_channels=3)
+    # summary(model_D,input_size=(3,256,256),device='cpu')
+    # exit()
+    model = SRSCNet(num_ch=3,num_res=16,num_feat=128)
+    summary(model=model,input_size=(3,128,128),device='cpu')
     exit()
     import time
     import torch.quantization
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = SRSCNet()
-    # summary(model=model,input_size=(1,400,280),device='cpu')
+    summary(model=model,input_size=(1,400,280),device='cpu')
+    exit()
     model.eval()
     input = torch.rand(size=(12,1,1280//2,720//2),device=device)
     start_time = time.time()

@@ -1,8 +1,20 @@
-### SRSCNet
+# SRSCNet
+
+SRSCNet是一个单卷积图像超分轻量化模型
+
+<table>
+  <tr>
+    <td><img src="temp/input.jpg" width="256px"></td>
+    <td><img src="images/right.png" width="100"></td>
+    <td><img src="temp/output.jpg" width="256px"></td>
+  </tr>
+</table>
+
+### 特性
 
 - 1x1 卷积网络，实现轻量级图像超分辨率。
-- 该模型可以通过极小的参数量训练产生不错的图像增强效果。
-- 相比同等非GAN训练的 SRResNet 质量相差不大且有超50倍的速度提升。
+- 该模型可以通过极小的参数量训练产生不错的图像增强效果
+- 初步统计速度快一般的SRResNet超50倍+。
 
 ### 支持的功能
 - 图片2倍超分，增强
@@ -12,8 +24,8 @@
 - 图像超清对比（左边是普通放大方式，右边是SRSCNet）
 
 <table>
+<tr><td><img src="images/comic_lsr.jpg"></td><td><img src="images/comic_sr.jpg"></td></tr>
 <tr><td><img src="images/butterfly_GT_lsr.jpg"></td><td><img src="images/butterfly_GT_sr.jpg"></td></tr>
-<tr><td><img src="images/lsr_image.jpg"></td><td><img src="images/sr_image_hls.jpg"></td></tr>
 <table>
 
 ### 如何使用
@@ -64,6 +76,16 @@ python train.py --datafolder '图片文件夹路径'
 ```
 python traingan.py --datafolder '图片文件夹路径' --device 'cpu'
 ```
+
+### 训练建议
+
+- <b>初期:</b> 
+
+如果只有高清图像进行训练（目前内置训练脚本），建议在训练初期，对于输入，使用2次下采样后再上采样一次，这样能更快的训练出轮廓。之后再进行2x的训练进行微调（主要目的是消除前期4x的伪影，同时优化细节）。
+
+- <b>中后期:</b>
+
+批次大小可以缓慢降低，输入输出尺寸也可以尝试缓慢降低。
 
 ### 引用
 - [Fully 1×1 Convolutional Network for Lightweight Image Super-Resolution](http://arxiv.org/abs/2307.16140)

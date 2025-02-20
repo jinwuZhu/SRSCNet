@@ -19,10 +19,10 @@ from argparse import ArgumentParser
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='图像增强')
-    parser.add_argument('--checkpoint','-c', type=str,default='checkpoints/checkpoint_GAN_19.pth', help='从指定的检查点文件继续')
-    parser.add_argument('--datafolder', '-d', type=str, default= 'data/archive/test/images', help='训练数据集路径')
+    parser.add_argument('--checkpoint','-c', type=str,default='checkpoints/checkpoint_GAN_0_2.pth', help='从指定的检查点文件继续')
+    parser.add_argument('--datafolder', '-d', type=str, default= 'data/archive/valid/images', help='训练数据集路径')
     parser.add_argument('--testfolder', '-t', type=str, default= 'data/archive/test/images', help='测试数据集路径')
-    parser.add_argument('--epochs', '-e', type=int, default=30, help='训练次数')
+    parser.add_argument('--epochs', '-e', type=int, default=5, help='训练次数')
     parser.add_argument('--batch', '-b', type=int, default=8, help='批次大小')
     parser.add_argument('--device', type=str, default='cuda', help='训练设备')
 
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         transforms.Normalize(mean=[0.5], std=[0.5])  # 单通道归一化
     ])
     #构建数据集
-    train_dataset = HDImageDatasetN3(train_dataset_folder,transform=transform, crop_size=(input_size, input_size),max_len=400)
+    train_dataset = HDImageDatasetN3(train_dataset_folder,transform=transform, crop_size=(input_size, input_size))
     #加快训练设置了<num_workers，pin_memory，drop_last>资源不足可以都删除掉
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=16, pin_memory=True, drop_last=True)
     valid_dataset = HDImageDatasetN3(test_dataset_folder,transform=transform, crop_size=(input_size, input_size),max_len=4)

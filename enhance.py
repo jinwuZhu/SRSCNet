@@ -27,14 +27,15 @@ def enhance_image(original_img,model,device):
 
 def main():
     parser = ArgumentParser(description='图像/视频增强')
-    parser.add_argument('--model','-m', type=str,default='checkpoints/checkpoint_GAN_0.pth', help='模型路径')
+    parser.add_argument('--model','-m', type=str,default='checkpoints/anim_c3_r16_n64.pth', help='模型路径')
     parser.add_argument('--input','-i', type=str,default='', help='输入文件路径')
     parser.add_argument('--output', '-o', type=str, default='sr_image.jpg', help='输出文件路径 (默认: sr_image.jpg)')
+    parser.add_argument('--dump', '-d', type=str, default='yes', help='是否在增强视频过程中显示对比？yes:no')
 
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = SRSCNet(num_ch=3,num_res=32,num_feat=128)
+    model = SRSCNet(num_ch=3,num_res=16,num_feat=64)
     checkpoint = torch.load(args.model, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
@@ -42,6 +43,7 @@ def main():
 
     input_path:str = args.input
     output_path:str = args.output  # 超分辨率图像保存路径
+    enable_debug:bool = args.dump.lower() == "yes"
 
     # 判断是视频还是图片
     if input_path.lower().endswith('.mp4'):
@@ -54,8 +56,13 @@ def main():
             ret, original_img = video_reader.read()
             if not ret:
                 break
+            # input_image = original_img if (original_img.shape[1]*original_img.shape[0]) < 400*400 else cv2.resize(original_img,dsize=(original_img.shape[1]*2//4,original_img.shape[0]*2//4))
             sr_image = enhance_image(original_img,model,device)
             video_writer.write(sr_image)
+            if(enable_debug):
+                cv2.imshow("low_sr",cv2.resize(original_img,dsize=(int(input_width*1),int(input_height*1)),interpolation=cv2.INTER_CUBIC))
+                cv2.imshow("SRSCNet_sr",cv2.resize(sr_image,dsize=(int(input_width*1),int(input_height*1))))
+                cv2.waitKey(1)
         video_reader.release()
         video_writer.release()
     else:

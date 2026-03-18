@@ -4,9 +4,14 @@ SRSCNet是一个单卷积图像超分轻量化模型
 
 <table>
   <tr>
+    <td>输入</td>
+    <td>输出</td>
+    <td>原图</td>
+  </tr>
+  <tr>
     <td><img src="temp/input.jpg" width="256px"></td>
-    <td><img src="images/right.png" width="100"></td>
     <td><img src="temp/output.jpg" width="256px"></td>
+    <td><img src="temp/target.jpg" width="256px"></td>
   </tr>
 </table>
 
